@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import { getSchedules, getScheduleGrid, type ScheduleGrid } from "./stewardhq_api";
 
 const App = () => {
