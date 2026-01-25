@@ -54,7 +54,7 @@ interface ScheduleGridEvent {
     availability: NestedUser[];
 }
 
-export interface ScheduleGrid extends Schedule {
+export interface ScheduleGridResponse extends Schedule {
     events: ScheduleGridEvent[];
 }
 
@@ -75,7 +75,7 @@ export const getScheduleGrid = async (scheduleId: string) => {
         throw new Error(`Failed to fetch schedule grid: ${res.statusText}`);
     }
     const data = await res.json();
-    const scheduleGrid = data as ScheduleGrid;
+    const scheduleGrid = data as ScheduleGridResponse;
     // console.log(scheduleGrid);
     return scheduleGrid;
 };
