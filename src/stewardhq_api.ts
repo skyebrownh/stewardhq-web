@@ -5,6 +5,26 @@ const HEADERS = {
     "x-api-key": STEWARDHQ_API_KEY
 };
 
+export interface Role {
+    id: string;
+    name: string;
+    description: string;
+    order: number;
+    code: string;
+    is_active: boolean;
+}
+
+export const getRoles = async () => {
+    const res = await fetch(`${STEWARDHQ_API_BASE_URL}/roles`, { headers: HEADERS });
+    if (!res.ok) {
+        throw new Error(`Failed to fetch roles: ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    const roles = data as Role[];
+    return roles;
+};
+
 interface Schedule {
     id: string;
     month: number;
