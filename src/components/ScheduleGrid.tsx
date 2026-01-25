@@ -1,8 +1,12 @@
 import { useMemo } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/catalyst-ui-kit/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./catalyst-ui-kit/table";
+import ScheduleGridSkeleton from "./skeletons/ScheduleGridSkeleton";
+import ErrorState from "./ui/ErrorState";
+import EmptyState from "./ui/EmptyState";
 import { useRolesQuery } from "../queries/roles.queries";
 import { useScheduleGridQuery, useSchedulesQuery } from "../queries/schedules.queries";
 import { formatEventDate } from "../lib/date";
+import { queryClient } from "../lib/queryClient";
 
 const ScheduleGrid = () => {
     const { data: roles, isLoading: rolesLoading, error: rolesError } = useRolesQuery();
@@ -45,8 +49,16 @@ const ScheduleGrid = () => {
     const isLoading = rolesLoading || schedulesLoading || gridLoading;
     const error = rolesError || schedulesError || gridError;
 
-    if (isLoading) return <p>Loading...</p>;
-    if (error instanceof Error) return <p>Error: {error.message}</p>;
+    if (isLoading) return <ScheduleGridSkeleton />;
+    if (error)
+        return (
+            <ErrorState
+                title="Unable to load schedule"
+                message="There was an error loading the schedule. Please try again."
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ["schedule-grid", scheduleId] })}
+            />
+        );
+    if (sortedEvents.length === 0) return <EmptyState message="No events scheduled for this month." />;
 
     return (
         <Table dense>
