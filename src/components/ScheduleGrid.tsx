@@ -1,29 +1,12 @@
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns/fp";
-import { getRoles, getSchedules, getScheduleGrid, type ScheduleGridResponse, type Role } from "../stewardhq_api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/catalyst-ui-kit/table";
+import { useRolesQuery } from "../queries/roles.queries";
+import { useScheduleGridQuery, useSchedulesQuery } from "../queries/schedules.queries";
+import { formatEventDate } from "../lib/date";
 
 const ScheduleGrid = () => {
-    // Fetch roles
-    const {
-        data: roles,
-        isLoading: rolesLoading,
-        error: rolesError
-    } = useQuery<Role[]>({
-        queryKey: ["roles"],
-        queryFn: getRoles
-    });
-
-    // Fetch schedules
-    const {
-        data: schedules,
-        isLoading: schedulesLoading,
-        error: schedulesError
-    } = useQuery({
-        queryKey: ["schedules"],
-        queryFn: getSchedules
-    });
+    const { data: roles, isLoading: rolesLoading, error: rolesError } = useRolesQuery();
+    const { data: schedules, isLoading: schedulesLoading, error: schedulesError } = useSchedulesQuery();
 
     // Derive the scheduleId
     const scheduleId = useMemo(
@@ -31,22 +14,36 @@ const ScheduleGrid = () => {
         [schedules]
     );
 
-    // Fetch schedule grid (depends on scheduleId)
-    const {
-        data: scheduleGrid,
-        isLoading: gridLoading,
-        error: gridError
-    } = useQuery<ScheduleGridResponse>({
-        queryKey: ["scheduleGrid", scheduleId],
-        queryFn: () => getScheduleGrid(scheduleId!),
-        enabled: Boolean(scheduleId) // prevents premature fetch
-    });
+    const { data: scheduleGrid, isLoading: gridLoading, error: gridError } = useScheduleGridQuery(scheduleId!);
+
+    const activeRoles = useMemo(() => {
+        if (!roles) return [];
+        return [...roles].sort((a, b) => a.order - b.order).filter((role) => role.is_active);
+    }, [roles]);
+
+    const sortedEvents = useMemo(() => {
+        if (!scheduleGrid) return [];
+        return [...scheduleGrid.events].sort(
+            (a, b) => new Date(a.event.starts_at).getTime() - new Date(b.event.starts_at).getTime()
+        );
+    }, [scheduleGrid]);
+
+    const assignmentsByEventId = useMemo(() => {
+        const map = new Map<string, Map<string, string>>();
+
+        sortedEvents.forEach((eventObj) => {
+            const roleMap = new Map<string, string>();
+            eventObj.event_assignments?.forEach((assignment) => {
+                roleMap.set(assignment.role_code, assignment.assigned_user_first_name);
+            });
+            map.set(eventObj.event.id, roleMap);
+        });
+
+        return map;
+    }, [sortedEvents]);
 
     const isLoading = rolesLoading || schedulesLoading || gridLoading;
     const error = rolesError || schedulesError || gridError;
-
-    const toTime = (iso: string) => new Date(iso).getTime();
-    const formatEventDate = (iso: string) => format("E - dd MMM", new Date(iso));
 
     if (isLoading) return <p>Loading...</p>;
     if (error instanceof Error) return <p>Error: {error.message}</p>;
@@ -56,33 +53,23 @@ const ScheduleGrid = () => {
             <TableHead>
                 <TableRow>
                     <TableHeader>Event</TableHeader>
-                    {roles?.map((role) => {
-                        if (!role.is_active) return null;
-                        return <TableHeader key={role.id}>{role.name}</TableHeader>;
-                    })}
+                    {activeRoles?.map((role) => (
+                        <TableHeader key={role.id}>{role.name}</TableHeader>
+                    ))}
                     <TableHeader>Unavailable</TableHeader>
                     <TableHeader>Notes</TableHeader>
                 </TableRow>
             </TableHead>
             <TableBody>
-                {scheduleGrid?.events
-                    ?.sort((a, b) => toTime(a.event?.starts_at) - toTime(b.event?.starts_at))
-                    .map((eventObj) => (
+                {sortedEvents.map((eventObj) => {
+                    const roleMap = assignmentsByEventId.get(eventObj.event?.id);
+                    return (
                         <TableRow key={eventObj.event?.id}>
                             <TableCell>{formatEventDate(eventObj.event?.starts_at)}</TableCell>
 
-                            {roles?.map((role) => {
-                                if (!role.is_active) return null;
-                                return (
-                                    <TableCell key={role.id}>
-                                        {
-                                            eventObj.event_assignments?.find(
-                                                (assignment) => assignment.role_code === role.code
-                                            )?.assigned_user_first_name
-                                        }
-                                    </TableCell>
-                                );
-                            })}
+                            {activeRoles.map((role) => (
+                                <TableCell key={role.id}>{roleMap?.get(role.code)}</TableCell>
+                            ))}
 
                             <TableCell>
                                 {eventObj.availability
@@ -93,7 +80,8 @@ const ScheduleGrid = () => {
 
                             <TableCell>{eventObj.event?.notes}</TableCell>
                         </TableRow>
-                    ))}
+                    );
+                })}
             </TableBody>
         </Table>
     );
