@@ -1,11 +1,5 @@
-import ScheduleGrid from "./components/ScheduleGrid";
-
 const App = () => {
-    return (
-        <>
-            <ScheduleGrid />
-        </>
-    );
+    return <></>;
 };
 
 export default App;

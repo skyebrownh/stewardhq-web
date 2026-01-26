@@ -14,6 +14,7 @@ import { type NestedEventAssignment, type Schedule } from "../types/schedule";
 import { Button } from "./catalyst-ui-kit/button";
 import { EyeIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
+import { Link } from "react-router";
 
 const ScheduleGrid = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
@@ -171,14 +172,16 @@ const ScheduleGrid = () => {
                                     return (
                                         <TableCell key={role.id} className="py-1.5! px-2!">
                                             <Button plain disabled={!assignment?.is_applicable}>
-                                                <span
-                                                    className={`font-normal ${assignment?.is_applicable ? "text-slate-800" : "text-slate-400"}`}>
-                                                    {assignment?.is_applicable
-                                                        ? assignment?.assigned_user_first_name || (
-                                                              <PlusCircleIcon className="w-6 h-6 text-blue-400" />
-                                                          )
-                                                        : "—"}
-                                                </span>
+                                                <Link to={`/assignments/${assignment?.id}`}>
+                                                    <span
+                                                        className={`font-normal ${assignment?.is_applicable ? "text-slate-800" : "text-slate-400"}`}>
+                                                        {assignment?.is_applicable
+                                                            ? assignment?.assigned_user_first_name || (
+                                                                  <PlusCircleIcon className="w-6 h-6 text-blue-400" />
+                                                              )
+                                                            : "—"}
+                                                    </span>
+                                                </Link>
                                             </Button>
                                         </TableCell>
                                     );
