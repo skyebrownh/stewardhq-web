@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Table, TableBody, TableHead } from "@catalyst/table";
 import ScheduleGridSkeleton from "@components/skeletons/ScheduleGridSkeleton";
 import ErrorState from "@components/ui/ErrorState";
@@ -9,32 +9,21 @@ import { formatScheduleDate } from "@lib/date";
 import { queryClient } from "@lib/queryClient";
 import { Heading } from "@catalyst/heading";
 import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
-import type { NestedEventAssignment, Schedule } from "@type-defs/schedule";
 import { Button } from "@catalyst/button";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
-import ScheduleGridRow from "./ScheduleGridRow";
-import ScheduleGridHeaderRow from "./ScheduleGridHeaderRow";
+import ScheduleGridRow from "./table/ScheduleGridRow";
+import ScheduleGridHeaderRow from "./table/ScheduleGridHeaderRow";
+import { useScheduleSelection } from "./hooks/useScheduleSelection";
+import { useScheduleGridData } from "./hooks/useScheduleGridData";
 
 const ScheduleGrid = () => {
-    const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
     const [hideUnavailable, setHideUnavailable] = useState(false);
 
     const { data: roles, isLoading: rolesLoading, error: rolesError } = useRolesQuery();
     const { data: schedules, isLoading: schedulesLoading, error: schedulesError } = useSchedulesQuery();
 
-    // Derive the scheduleId
-    const defaultSchedule = useMemo(() => {
-        if (!schedules?.length) return null;
-
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-
-        return schedules.find((s) => s.year === currentYear && s.month === currentMonth) ?? schedules[0];
-    }, [schedules]);
-
-    const effectiveSchedule = selectedSchedule ?? defaultSchedule;
+    const { effectiveSchedule, setSelectedSchedule } = useScheduleSelection(schedules);
 
     const {
         data: scheduleGrid,
@@ -42,36 +31,11 @@ const ScheduleGrid = () => {
         error: gridError
     } = useScheduleGridQuery(effectiveSchedule?.id);
 
-    const activeRoles = useMemo(() => {
-        if (!roles) return [];
-        return [...roles].sort((a, b) => a.order - b.order).filter((role) => role.is_active);
-    }, [roles]);
-
-    const sortedSchedules = useMemo(() => {
-        if (!schedules) return [];
-        return [...schedules].sort((a, b) => a.year - b.year || a.month - b.month);
-    }, [schedules]);
-
-    const sortedEvents = useMemo(() => {
-        if (!scheduleGrid) return [];
-        return [...scheduleGrid.events].sort(
-            (a, b) => new Date(a.event.starts_at).getTime() - new Date(b.event.starts_at).getTime()
-        );
-    }, [scheduleGrid]);
-
-    const assignmentsByEventId = useMemo(() => {
-        const map = new Map<string, Map<string, NestedEventAssignment>>();
-
-        sortedEvents.forEach((eventObj) => {
-            const roleMap = new Map<string, NestedEventAssignment>();
-            eventObj.event_assignments?.forEach((assignment) => {
-                roleMap.set(assignment.role_code, assignment);
-            });
-            map.set(eventObj.event.id, roleMap);
-        });
-
-        return map;
-    }, [sortedEvents]);
+    const { activeRoles, sortedSchedules, sortedEvents, assignmentsByEventId } = useScheduleGridData(
+        roles,
+        schedules,
+        scheduleGrid
+    );
 
     const handleRetry = () => {
         if (!effectiveSchedule) return;
@@ -95,7 +59,10 @@ const ScheduleGrid = () => {
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-slate-950/10 pb-6">
-                <Heading>{formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)} Schedule</Heading>
+                <Heading>
+                    {effectiveSchedule ? formatScheduleDate(effectiveSchedule.year, effectiveSchedule.month) : "(NA)"}{" "}
+                    Schedule
+                </Heading>
                 <div className="flex gap-4">
                     <div>
                         <Button outline onClick={() => setHideUnavailable((prev) => !prev)}>
@@ -103,24 +70,26 @@ const ScheduleGrid = () => {
                             {hideUnavailable ? "Show Unavailable" : "Hide Unavailable"}
                         </Button>
                     </div>
-                    <div>
-                        <Listbox
-                            name="schedule"
-                            value={formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)}
-                            onChange={(value: string) =>
-                                setSelectedSchedule(
-                                    schedules?.find((s) => formatScheduleDate(s.year, s.month) === value) ?? null
-                                )
-                            }>
-                            {sortedSchedules?.map((schedule) => (
-                                <ListboxOption
-                                    key={schedule.id}
-                                    value={formatScheduleDate(schedule.year, schedule.month)}>
-                                    <ListboxLabel>{formatScheduleDate(schedule.year, schedule.month)}</ListboxLabel>
-                                </ListboxOption>
-                            ))}
-                        </Listbox>
-                    </div>
+                    {effectiveSchedule && (
+                        <div>
+                            <Listbox
+                                name="schedule"
+                                value={formatScheduleDate(effectiveSchedule.year, effectiveSchedule.month)}
+                                onChange={(value: string) =>
+                                    setSelectedSchedule(
+                                        schedules?.find((s) => formatScheduleDate(s.year, s.month) === value) ?? null
+                                    )
+                                }>
+                                {sortedSchedules?.map((schedule) => (
+                                    <ListboxOption
+                                        key={schedule.id}
+                                        value={formatScheduleDate(schedule.year, schedule.month)}>
+                                        <ListboxLabel>{formatScheduleDate(schedule.year, schedule.month)}</ListboxLabel>
+                                    </ListboxOption>
+                                ))}
+                            </Listbox>
+                        </div>
+                    )}
                 </div>
             </div>
             <Table dense>

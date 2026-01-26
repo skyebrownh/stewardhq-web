@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import AssignmentModal from "@components/ScheduleGrid/AssignmentModal";
+import AssignmentModal from "@/components/ScheduleGrid/modals/AssignmentModal";
 import ScheduleGridLayout from "@components/ScheduleGrid/ScheduleGridLayout";
 
 export const router = createBrowserRouter([
