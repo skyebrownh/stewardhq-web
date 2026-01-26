@@ -9,7 +9,7 @@ import { formatEventDate, formatScheduleDate } from "../lib/date";
 import { queryClient } from "../lib/queryClient";
 import { Heading } from "./catalyst-ui-kit/heading";
 import { Listbox, ListboxLabel, ListboxOption } from "./catalyst-ui-kit/listbox";
-import { type Schedule } from "../types/schedule";
+import { type NestedEventAssignment, type Schedule } from "../types/schedule";
 import { Button } from "./catalyst-ui-kit/button";
 
 const ScheduleGrid = () => {
@@ -55,18 +55,29 @@ const ScheduleGrid = () => {
     }, [scheduleGrid]);
 
     const assignmentsByEventId = useMemo(() => {
-        const map = new Map<string, Map<string, string>>();
+        const map = new Map<string, Map<string, NestedEventAssignment>>();
 
         sortedEvents.forEach((eventObj) => {
-            const roleMap = new Map<string, string>();
+            const roleMap = new Map<string, NestedEventAssignment>();
             eventObj.event_assignments?.forEach((assignment) => {
-                roleMap.set(assignment.role_code, assignment.assigned_user_first_name);
+                roleMap.set(assignment.role_code, assignment);
             });
             map.set(eventObj.event.id, roleMap);
         });
 
         return map;
     }, [sortedEvents]);
+
+    const getEventDateElement = (iso: string) => {
+        const { weekday, day } = formatEventDate(iso);
+        return (
+            <p className="flex items-center gap-2 font-semibold">
+                <span className="min-w-[4ch] text-slate-800 uppercase tracking-wide">{weekday}</span>
+                <span className="h-4 w-px bg-slate-300 shrink-0" />
+                <span className="tabular-nums text-slate-800 bg-slate-200 rounded-md px-1 py-0.5">{day}</span>
+            </p>
+        );
+    };
 
     const isLoading = rolesLoading || schedulesLoading || gridLoading;
     const error = rolesError || schedulesError || gridError;
@@ -87,7 +98,7 @@ const ScheduleGrid = () => {
 
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+            <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-slate-950/10 pb-6">
                 <Heading>{formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)} Schedule</Heading>
                 <div className="flex gap-4">
                     <Listbox
@@ -108,7 +119,7 @@ const ScheduleGrid = () => {
             </div>
             <Table dense>
                 <TableHead>
-                    <TableRow>
+                    <TableRow className="bg-slate-100 text-slate-800">
                         <TableHeader>Event</TableHeader>
                         {activeRoles?.map((role) => (
                             <TableHeader key={role.id}>{role.name}</TableHeader>
@@ -121,24 +132,29 @@ const ScheduleGrid = () => {
                         const roleMap = assignmentsByEventId.get(eventObj.event?.id);
                         return (
                             <TableRow key={eventObj.event?.id}>
-                                <TableCell>
-                                    <p>{formatEventDate(eventObj.event?.starts_at)}</p>
-                                    <p className="text-xs text-gray-500 mt-0.5">{eventObj.event?.notes}</p>
+                                <TableCell className="py-1.5!">
+                                    {getEventDateElement(eventObj.event?.starts_at)}
+                                    <p className="text-xs text-slate-600 mt-1.5">{eventObj.event?.notes}</p>
                                 </TableCell>
 
-                                {activeRoles.map((role) => (
-                                    <TableCell key={role.id}>
-                                        <Button
-                                            plain
-                                            onClick={() => {
-                                                console.log(roleMap?.get(role.code));
-                                            }}>
-                                            <span className="font-normal">{roleMap?.get(role.code)}</span>
-                                        </Button>
-                                    </TableCell>
-                                ))}
+                                {activeRoles.map((role) => {
+                                    const assignment = roleMap?.get(role.code);
+                                    return (
+                                        <TableCell key={role.id} className="py-1.5!">
+                                            <Button
+                                                plain
+                                                onClick={() => {
+                                                    console.log(assignment);
+                                                }}>
+                                                <span className="font-normal">
+                                                    {assignment?.assigned_user_first_name}
+                                                </span>
+                                            </Button>
+                                        </TableCell>
+                                    );
+                                })}
 
-                                <TableCell>
+                                <TableCell className="py-1.5!">
                                     {eventObj.availability
                                         ?.map((user) => user.user_first_name)
                                         .sort((a, b) => a.localeCompare(b))
