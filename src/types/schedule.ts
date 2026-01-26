@@ -6,7 +6,7 @@ export interface Schedule {
     is_active: boolean;
 }
 
-interface NestedUser {
+export interface NestedUser {
     user_id: string;
     user_first_name: string;
     user_last_name: string;
@@ -26,7 +26,7 @@ export interface NestedEventAssignment {
     is_active: boolean;
 }
 
-interface NestedEvent {
+export interface NestedEvent {
     id: string;
     title: string;
     starts_at: string;
@@ -41,7 +41,7 @@ interface NestedEvent {
     event_type_code: string;
 }
 
-interface ScheduleGridEvent {
+export interface ScheduleGridEvent {
     event: NestedEvent;
     event_assignments: NestedEventAssignment[];
     availability: NestedUser[];
