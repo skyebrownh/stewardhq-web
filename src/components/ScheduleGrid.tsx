@@ -11,9 +11,12 @@ import { Heading } from "./catalyst-ui-kit/heading";
 import { Listbox, ListboxLabel, ListboxOption } from "./catalyst-ui-kit/listbox";
 import { type NestedEventAssignment, type Schedule } from "../types/schedule";
 import { Button } from "./catalyst-ui-kit/button";
+import { EyeIcon } from "@heroicons/react/24/outline";
+import { EyeSlashIcon } from "@heroicons/react/24/solid";
 
 const ScheduleGrid = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
+    const [hideUnavailable, setHideUnavailable] = useState(false);
 
     const { data: roles, isLoading: rolesLoading, error: rolesError } = useRolesQuery();
     const { data: schedules, isLoading: schedulesLoading, error: schedulesError } = useSchedulesQuery();
@@ -101,20 +104,30 @@ const ScheduleGrid = () => {
             <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-slate-950/10 pb-6">
                 <Heading>{formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)} Schedule</Heading>
                 <div className="flex gap-4">
-                    <Listbox
-                        name="schedule"
-                        value={formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)}
-                        onChange={(value: string) =>
-                            setSelectedSchedule(
-                                schedules?.find((s) => formatScheduleDate(s.year, s.month) === value) ?? null
-                            )
-                        }>
-                        {sortedSchedules?.map((schedule) => (
-                            <ListboxOption key={schedule.id} value={formatScheduleDate(schedule.year, schedule.month)}>
-                                <ListboxLabel>{formatScheduleDate(schedule.year, schedule.month)}</ListboxLabel>
-                            </ListboxOption>
-                        ))}
-                    </Listbox>
+                    <div>
+                        <Button outline onClick={() => setHideUnavailable((prev) => !prev)}>
+                            {hideUnavailable ? <EyeIcon /> : <EyeSlashIcon />}
+                            {hideUnavailable ? "Show Unavailable" : "Hide Unavailable"}
+                        </Button>
+                    </div>
+                    <div>
+                        <Listbox
+                            name="schedule"
+                            value={formatScheduleDate(effectiveSchedule!.year, effectiveSchedule!.month)}
+                            onChange={(value: string) =>
+                                setSelectedSchedule(
+                                    schedules?.find((s) => formatScheduleDate(s.year, s.month) === value) ?? null
+                                )
+                            }>
+                            {sortedSchedules?.map((schedule) => (
+                                <ListboxOption
+                                    key={schedule.id}
+                                    value={formatScheduleDate(schedule.year, schedule.month)}>
+                                    <ListboxLabel>{formatScheduleDate(schedule.year, schedule.month)}</ListboxLabel>
+                                </ListboxOption>
+                            ))}
+                        </Listbox>
+                    </div>
                 </div>
             </div>
             <Table dense>
@@ -124,7 +137,7 @@ const ScheduleGrid = () => {
                         {activeRoles?.map((role) => (
                             <TableHeader key={role.id}>{role.name}</TableHeader>
                         ))}
-                        <TableHeader>Unavailable</TableHeader>
+                        <TableHeader className={hideUnavailable ? "hidden" : ""}>Unavailable</TableHeader>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -132,7 +145,7 @@ const ScheduleGrid = () => {
                         const roleMap = assignmentsByEventId.get(eventObj.event?.id);
                         return (
                             <TableRow key={eventObj.event?.id}>
-                                <TableCell className="py-1.5!">
+                                <TableCell className="py-1.5! px-2!">
                                     {getEventDateElement(eventObj.event?.starts_at)}
                                     <p className="text-xs text-slate-600 mt-1.5">{eventObj.event?.notes}</p>
                                 </TableCell>
@@ -140,7 +153,7 @@ const ScheduleGrid = () => {
                                 {activeRoles.map((role) => {
                                     const assignment = roleMap?.get(role.code);
                                     return (
-                                        <TableCell key={role.id} className="py-1.5!">
+                                        <TableCell key={role.id} className="py-1.5! px-2!">
                                             <Button
                                                 plain
                                                 onClick={() => {
@@ -154,7 +167,7 @@ const ScheduleGrid = () => {
                                     );
                                 })}
 
-                                <TableCell className="py-1.5!">
+                                <TableCell className={`py-1.5! px-2! text-wrap ${hideUnavailable ? "hidden" : ""}`}>
                                     {eventObj.availability
                                         ?.map((user) => user.user_first_name)
                                         .sort((a, b) => a.localeCompare(b))
