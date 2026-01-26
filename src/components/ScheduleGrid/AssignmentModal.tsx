@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button } from "./catalyst-ui-kit/button";
-import { Dialog } from "./catalyst-ui-kit/dialog";
-import { DialogTitle } from "./catalyst-ui-kit/dialog";
-import { DialogDescription } from "./catalyst-ui-kit/dialog";
-import { DialogBody } from "./catalyst-ui-kit/dialog";
-import { Field, Label } from "./catalyst-ui-kit/fieldset";
-import { Input } from "./catalyst-ui-kit/input";
-import { DialogActions } from "./catalyst-ui-kit/dialog";
+import { Button } from "@catalyst/button";
+import { Dialog } from "@catalyst/dialog";
+import { DialogTitle } from "@catalyst/dialog";
+import { DialogDescription } from "@catalyst/dialog";
+import { DialogBody } from "@catalyst/dialog";
+import { Field, Label } from "@catalyst/fieldset";
+import { Input } from "@catalyst/input";
+import { DialogActions } from "@catalyst/dialog";
 import { useNavigate, useParams } from "react-router";
 
 const AssignmentModal = () => {

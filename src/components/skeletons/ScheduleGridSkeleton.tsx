@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../catalyst-ui-kit/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@catalyst/table";
 
 const SkeletonCell = () => <div className="h-8 w-full rounded bg-gray-200 animate-pulse" />;
 

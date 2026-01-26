@@ -7,6 +7,16 @@
         "module": "ESNext",
         "types": ["vite/client"],
         "skipLibCheck": true,
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["./*"],
+            "@components/*": ["./components/*"],
+            "@catalyst/*": ["./components/catalyst-ui-kit/*"],
+            "@api/*": ["./api/*"],
+            "@lib/*": ["./lib/*"],
+            "@type-defs/*": ["./types/*"],
+            "@queries/*": ["./queries/*"]
+        },
 
         /* Bundler mode */
         "moduleResolution": "bundler",
