@@ -1,8 +1,8 @@
 import type { NestedEventAssignment, ScheduleGridEvent } from "@type-defs/schedule";
 import { TableRow } from "@catalyst/table";
-import EventCell from "@components/ScheduleGrid/EventCell";
-import RoleAssignmentCell from "@components/ScheduleGrid/RoleAssignmentCell";
-import UnavailableCell from "@components/ScheduleGrid/UnavailableCell";
+import EventCell from "@/components/ScheduleGrid/cells/EventCell";
+import RoleAssignmentCell from "@/components/ScheduleGrid/cells/RoleAssignmentCell";
+import UnavailableCell from "@/components/ScheduleGrid/cells/UnavailableCell";
 import type { Role } from "@/types/role";
 
 interface ScheduleGridRowProps {
