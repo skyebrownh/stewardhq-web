@@ -5,17 +5,12 @@ import ErrorState from "@components/ui/ErrorState";
 import EmptyState from "@components/ui/EmptyState";
 import { useRolesQuery } from "@queries/roles.queries";
 import { useScheduleGridQuery, useSchedulesQuery } from "@queries/schedules.queries";
-import { formatScheduleDate } from "@lib/date";
 import { queryClient } from "@lib/queryClient";
-import { Heading } from "@catalyst/heading";
-import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
-import { Button } from "@catalyst/button";
-import { EyeIcon } from "@heroicons/react/24/outline";
-import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import ScheduleGridRow from "./table/ScheduleGridRow";
 import ScheduleGridHeaderRow from "./table/ScheduleGridHeaderRow";
 import { useScheduleSelection } from "./hooks/useScheduleSelection";
 import { useScheduleGridData } from "./hooks/useScheduleGridData";
+import ScheduleGridHeader from "./table/ScheduleGridHeader";
 
 const ScheduleGrid = () => {
     const [hideUnavailable, setHideUnavailable] = useState(false);
@@ -54,44 +49,18 @@ const ScheduleGrid = () => {
                 onRetry={handleRetry}
             />
         );
-    if (!sortedEvents.length) return <EmptyState message="No events found." />;
+    if (!effectiveSchedule) return <EmptyState message="No schedule found." />;
 
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-slate-950/10 pb-6">
-                <Heading>
-                    {effectiveSchedule ? formatScheduleDate(effectiveSchedule.year, effectiveSchedule.month) : "(NA)"}{" "}
-                    Schedule
-                </Heading>
-                <div className="flex gap-4">
-                    <div>
-                        <Button outline onClick={() => setHideUnavailable((prev) => !prev)}>
-                            {hideUnavailable ? <EyeIcon /> : <EyeSlashIcon />}
-                            {hideUnavailable ? "Show Unavailable" : "Hide Unavailable"}
-                        </Button>
-                    </div>
-                    {effectiveSchedule && (
-                        <div>
-                            <Listbox
-                                name="schedule"
-                                value={formatScheduleDate(effectiveSchedule.year, effectiveSchedule.month)}
-                                onChange={(value: string) =>
-                                    setSelectedSchedule(
-                                        schedules?.find((s) => formatScheduleDate(s.year, s.month) === value) ?? null
-                                    )
-                                }>
-                                {sortedSchedules?.map((schedule) => (
-                                    <ListboxOption
-                                        key={schedule.id}
-                                        value={formatScheduleDate(schedule.year, schedule.month)}>
-                                        <ListboxLabel>{formatScheduleDate(schedule.year, schedule.month)}</ListboxLabel>
-                                    </ListboxOption>
-                                ))}
-                            </Listbox>
-                        </div>
-                    )}
-                </div>
-            </div>
+            <ScheduleGridHeader
+                schedule={effectiveSchedule}
+                hideUnavailable={hideUnavailable}
+                onToggleHideUnavailable={() => setHideUnavailable((prev) => !prev)}
+                schedules={sortedSchedules}
+                onSelectSchedule={(schedule) => setSelectedSchedule(schedule)}
+            />
+
             <Table dense>
                 <TableHead>
                     <ScheduleGridHeaderRow activeRoles={activeRoles} hideUnavailable={hideUnavailable} />
