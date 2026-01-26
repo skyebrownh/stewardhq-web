@@ -10,6 +10,7 @@ import { queryClient } from "../lib/queryClient";
 import { Heading } from "./catalyst-ui-kit/heading";
 import { Listbox, ListboxLabel, ListboxOption } from "./catalyst-ui-kit/listbox";
 import { type Schedule } from "../types/schedule";
+import { Button } from "./catalyst-ui-kit/button";
 
 const ScheduleGrid = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
@@ -126,7 +127,15 @@ const ScheduleGrid = () => {
                                 </TableCell>
 
                                 {activeRoles.map((role) => (
-                                    <TableCell key={role.id}>{roleMap?.get(role.code)}</TableCell>
+                                    <TableCell key={role.id}>
+                                        <Button
+                                            plain
+                                            onClick={() => {
+                                                console.log(roleMap?.get(role.code));
+                                            }}>
+                                            <span className="font-normal">{roleMap?.get(role.code)}</span>
+                                        </Button>
+                                    </TableCell>
                                 ))}
 
                                 <TableCell>
