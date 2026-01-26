@@ -12,9 +12,9 @@ interface NestedUser {
     user_last_name: string;
 }
 
-interface NestedEventAssignment {
+export interface NestedEventAssignment {
     id: string;
-    is_appliable: boolean;
+    is_applicable: boolean;
     requirement_level: string;
     role_id: string;
     role_name: string;
