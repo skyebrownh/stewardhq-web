@@ -1,4 +1,4 @@
-import { Button } from "../catalyst-ui-kit/button";
+import { Button } from "@catalyst/button";
 
 interface ErrorStateProps {
     title?: string;

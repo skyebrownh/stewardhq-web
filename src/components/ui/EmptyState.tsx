@@ -1,4 +1,4 @@
-import { Text } from "../catalyst-ui-kit/text";
+import { Text } from "@catalyst/text";
 
 interface EmptyStateProps {
     message?: string;
