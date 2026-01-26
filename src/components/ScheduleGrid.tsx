@@ -133,11 +133,13 @@ const ScheduleGrid = () => {
             <Table dense>
                 <TableHead>
                     <TableRow className="bg-slate-100 text-slate-800">
-                        <TableHeader>Event</TableHeader>
+                        <TableHeader className="px-2!">Event</TableHeader>
                         {activeRoles?.map((role) => (
                             <TableHeader key={role.id}>{role.name}</TableHeader>
                         ))}
-                        <TableHeader className={hideUnavailable ? "hidden" : ""}>Unavailable</TableHeader>
+                        <TableHeader className={`px-2! bg-red-50 text-red-700 ${hideUnavailable ? "hidden" : ""}`}>
+                            Unavailable
+                        </TableHeader>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -167,7 +169,8 @@ const ScheduleGrid = () => {
                                     );
                                 })}
 
-                                <TableCell className={`py-1.5! px-2! text-wrap ${hideUnavailable ? "hidden" : ""}`}>
+                                <TableCell
+                                    className={`py-1.5! px-2! text-wrap bg-red-50 text-red-900 ${hideUnavailable ? "hidden" : ""}`}>
                                     {eventObj.availability
                                         ?.map((user) => user.user_first_name)
                                         .sort((a, b) => a.localeCompare(b))
