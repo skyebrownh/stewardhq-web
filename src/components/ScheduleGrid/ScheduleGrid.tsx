@@ -1,20 +1,21 @@
 import { useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@catalyst/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@catalyst/table";
 import ScheduleGridSkeleton from "@components/skeletons/ScheduleGridSkeleton";
 import ErrorState from "@components/ui/ErrorState";
 import EmptyState from "@components/ui/EmptyState";
-import Badge from "@components/ui/Badge";
 import { useRolesQuery } from "@queries/roles.queries";
 import { useScheduleGridQuery, useSchedulesQuery } from "@queries/schedules.queries";
-import { formatEventDate, formatScheduleDate } from "@lib/date";
+import { formatScheduleDate } from "@lib/date";
 import { queryClient } from "@lib/queryClient";
 import { Heading } from "@catalyst/heading";
 import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
 import type { NestedEventAssignment, Schedule } from "@type-defs/schedule";
 import { Button } from "@catalyst/button";
-import { EyeIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { EyeIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router";
+import EventCell from "@components/ScheduleGrid/EventCell";
+import UnavailableCell from "@components/ScheduleGrid/UnavailableCell";
+import RoleAssignmentCell from "./RoleAssignmentCell";
 
 const ScheduleGrid = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
@@ -73,26 +74,14 @@ const ScheduleGrid = () => {
         return map;
     }, [sortedEvents]);
 
-    const getEventCell = (dateIso: string, teamName: string) => {
-        const { weekday, day, startTime } = formatEventDate(dateIso);
-        return (
-            <div className="flex items-center gap-2 font-semibold">
-                <span className="min-w-[4ch] text-slate-800 uppercase tracking-wide">{weekday}</span>
-                <div className="flex items-center gap-2 bg-slate-200/50 rounded-md px-2 py-0.5 text-slate-800">
-                    <span className="tabular-nums">{day}</span>
-                    <span className="h-4 w-px bg-slate-400 shrink-0" />
-                    <span className="font-normal">{startTime}</span>
-                </div>
-                {!teamName && <Badge color="gray">No Team</Badge>}
-                {teamName === "Alpha" && <Badge color="pink">Alpha</Badge>}
-                {teamName === "Omega" && <Badge color="blue">Omega</Badge>}
-            </div>
-        );
-    };
-
     const getAbbreviatedRoleName = (role_name: string) => {
         // TODO: Add an abbreviated name to role in DB
         return role_name.replace("Camera Director", "Cam Director").replace("Camera", "");
+    };
+
+    const handleRetry = () => {
+        if (!effectiveSchedule) return;
+        queryClient.invalidateQueries({ queryKey: ["schedule-grid", effectiveSchedule.id] });
     };
 
     const isLoading = rolesLoading || schedulesLoading || gridLoading;
@@ -104,13 +93,10 @@ const ScheduleGrid = () => {
             <ErrorState
                 title="Unable to load schedule"
                 message="There was an error loading the schedule. Please try again."
-                onRetry={() => {
-                    if (!effectiveSchedule) return;
-                    queryClient.invalidateQueries({ queryKey: ["schedule-grid", effectiveSchedule.id] });
-                }}
+                onRetry={handleRetry}
             />
         );
-    if (sortedEvents.length === 0) return <EmptyState message="No events found." />;
+    if (!sortedEvents.length) return <EmptyState message="No events found." />;
 
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -162,38 +148,13 @@ const ScheduleGrid = () => {
                         const roleMap = assignmentsByEventId.get(eventObj.event?.id);
                         return (
                             <TableRow key={eventObj.event?.id}>
-                                <TableCell className="py-1.5! px-2!">
-                                    {getEventCell(eventObj.event?.starts_at, eventObj.event?.team_name)}
-                                    <p className="text-xs text-slate-600 mt-1.5">{eventObj.event?.notes}</p>
-                                </TableCell>
+                                <EventCell eventObj={eventObj} />
 
-                                {activeRoles.map((role) => {
-                                    const assignment = roleMap?.get(role.code);
-                                    return (
-                                        <TableCell key={role.id} className="py-1.5! px-2!">
-                                            <Button plain disabled={!assignment?.is_applicable}>
-                                                <Link to={`/assignments/${assignment?.id}`}>
-                                                    <span
-                                                        className={`font-normal ${assignment?.is_applicable ? "text-slate-800" : "text-slate-400"}`}>
-                                                        {assignment?.is_applicable
-                                                            ? assignment?.assigned_user_first_name || (
-                                                                  <PlusCircleIcon className="w-6 h-6 text-blue-400" />
-                                                              )
-                                                            : "—"}
-                                                    </span>
-                                                </Link>
-                                            </Button>
-                                        </TableCell>
-                                    );
-                                })}
+                                {activeRoles.map((role) => (
+                                    <RoleAssignmentCell key={role.id} assignment={roleMap?.get(role.code)} />
+                                ))}
 
-                                <TableCell
-                                    className={`py-1.5! px-2! text-wrap bg-red-50 text-red-700 font-light ${hideUnavailable ? "hidden" : ""}`}>
-                                    {eventObj.availability
-                                        ?.map((user) => user.user_first_name)
-                                        .sort((a, b) => a.localeCompare(b))
-                                        .join(", ")}
-                                </TableCell>
+                                <UnavailableCell eventObj={eventObj} hideUnavailable={hideUnavailable} />
                             </TableRow>
                         );
                     })}
