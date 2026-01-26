@@ -1,4 +1,4 @@
-import type { NestedEventAssignment } from "@type-defs/schedule";
+import type { NestedEventAssignment } from "@type-defs/assignment";
 import { TableCell } from "@catalyst/table";
 import { Link } from "react-router";
 import { Button } from "@catalyst/button";
