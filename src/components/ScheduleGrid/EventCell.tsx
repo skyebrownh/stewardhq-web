@@ -1,13 +1,13 @@
-import type { ScheduleGridEvent } from "@type-defs/schedule";
+import type { NestedEvent } from "@type-defs/schedule";
 import Badge from "@components/ui/Badge";
 import { TableCell } from "@catalyst/table";
 import { formatEventDate } from "@lib/date";
 
 interface EventCellProps {
-    eventObj: ScheduleGridEvent;
+    event: NestedEvent;
 }
 
-const EventCell = ({ eventObj: { event } }: EventCellProps) => {
+const EventCell = ({ event }: EventCellProps) => {
     const { weekday, day, startTime } = formatEventDate(event.starts_at);
     return (
         <TableCell className="py-1.5! px-2!">

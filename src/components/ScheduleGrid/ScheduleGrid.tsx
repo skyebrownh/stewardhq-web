@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@catalyst/table";
+import { Table, TableBody, TableHead } from "@catalyst/table";
 import ScheduleGridSkeleton from "@components/skeletons/ScheduleGridSkeleton";
 import ErrorState from "@components/ui/ErrorState";
 import EmptyState from "@components/ui/EmptyState";
@@ -13,9 +13,8 @@ import type { NestedEventAssignment, Schedule } from "@type-defs/schedule";
 import { Button } from "@catalyst/button";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
-import EventCell from "@components/ScheduleGrid/EventCell";
-import UnavailableCell from "@components/ScheduleGrid/UnavailableCell";
-import RoleAssignmentCell from "./RoleAssignmentCell";
+import ScheduleGridRow from "./ScheduleGridRow";
+import ScheduleGridHeaderRow from "./ScheduleGridHeaderRow";
 
 const ScheduleGrid = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
@@ -74,11 +73,6 @@ const ScheduleGrid = () => {
         return map;
     }, [sortedEvents]);
 
-    const getAbbreviatedRoleName = (role_name: string) => {
-        // TODO: Add an abbreviated name to role in DB
-        return role_name.replace("Camera Director", "Cam Director").replace("Camera", "");
-    };
-
     const handleRetry = () => {
         if (!effectiveSchedule) return;
         queryClient.invalidateQueries({ queryKey: ["schedule-grid", effectiveSchedule.id] });
@@ -131,31 +125,19 @@ const ScheduleGrid = () => {
             </div>
             <Table dense>
                 <TableHead>
-                    <TableRow className="bg-slate-100 text-slate-800">
-                        <TableHeader className="px-2!">Event</TableHeader>
-                        {activeRoles?.map((role) => (
-                            <TableHeader key={role.id} className="pl-5!">
-                                {getAbbreviatedRoleName(role.name)}
-                            </TableHeader>
-                        ))}
-                        <TableHeader className={`px-2! bg-red-50 text-red-700 ${hideUnavailable ? "hidden" : ""}`}>
-                            Unavailable
-                        </TableHeader>
-                    </TableRow>
+                    <ScheduleGridHeaderRow activeRoles={activeRoles} hideUnavailable={hideUnavailable} />
                 </TableHead>
                 <TableBody>
                     {sortedEvents.map((eventObj) => {
                         const roleMap = assignmentsByEventId.get(eventObj.event?.id);
                         return (
-                            <TableRow key={eventObj.event?.id}>
-                                <EventCell eventObj={eventObj} />
-
-                                {activeRoles.map((role) => (
-                                    <RoleAssignmentCell key={role.id} assignment={roleMap?.get(role.code)} />
-                                ))}
-
-                                <UnavailableCell eventObj={eventObj} hideUnavailable={hideUnavailable} />
-                            </TableRow>
+                            <ScheduleGridRow
+                                key={eventObj.event?.id}
+                                eventObj={eventObj}
+                                activeRoles={activeRoles}
+                                hideUnavailable={hideUnavailable}
+                                roleMap={roleMap}
+                            />
                         );
                     })}
                 </TableBody>

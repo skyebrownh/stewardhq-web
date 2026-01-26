@@ -1,15 +1,13 @@
-import type { ScheduleGridEvent } from "@type-defs/schedule";
+import type { NestedUser } from "@type-defs/schedule";
 import { TableCell } from "@catalyst/table";
 
 interface UnavailableCellProps {
-    eventObj: ScheduleGridEvent;
-    hideUnavailable: boolean;
+    availability: NestedUser[];
 }
 
-const UnavailableCell = ({ eventObj: { availability }, hideUnavailable }: UnavailableCellProps) => {
-    const hiddenClass = hideUnavailable ? "hidden" : "";
+const UnavailableCell = ({ availability }: UnavailableCellProps) => {
     return (
-        <TableCell className={`py-1.5! px-2! text-wrap bg-red-50 text-red-700 font-light ${hiddenClass}`}>
+        <TableCell className="py-1.5! px-2! text-wrap bg-red-50 text-red-700 font-light">
             {availability
                 ?.map((user) => user.user_first_name)
                 .sort((a, b) => a.localeCompare(b))
