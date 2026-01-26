@@ -1,6 +1,8 @@
-import type { NestedEventAssignment, Schedule, ScheduleGridResponse } from "@type-defs/schedule";
+import type { Schedule, ScheduleGridResponse } from "@type-defs/schedule";
+import type { Assignment, NestedEventAssignment } from "@type-defs/assignment";
 import type { Role } from "@type-defs/role";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { queryClient } from "@/lib/queryClient";
 
 export function useScheduleGridData(roles?: Role[], schedules?: Schedule[], scheduleGrid?: ScheduleGridResponse) {
     const activeRoles = useMemo(() => {
@@ -33,6 +35,22 @@ export function useScheduleGridData(roles?: Role[], schedules?: Schedule[], sche
 
         return map;
     }, [sortedEvents]);
+
+    // set query data for events and assignments
+    useEffect(() => {
+        if (!scheduleGrid) return;
+
+        scheduleGrid.events.forEach(({ event, event_assignments }) => {
+            queryClient.setQueryData(["event", event.id], event);
+
+            event_assignments.forEach((assignment) => {
+                queryClient.setQueryData<Assignment>(["assignment", assignment.id], {
+                    ...assignment,
+                    eventId: event.id
+                });
+            });
+        });
+    }, [scheduleGrid]);
 
     return { activeRoles, sortedSchedules, sortedEvents, assignmentsByEventId };
 }
