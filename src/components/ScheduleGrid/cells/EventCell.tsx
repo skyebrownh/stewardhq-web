@@ -1,7 +1,7 @@
-import type { NestedEvent } from "@type-defs/event.ts";
+import TeamBadge from "@/components/ui/TeamBadge";
 import { TableCell } from "@catalyst/table";
 import { formatEventDate } from "@lib/date";
-import TeamBadge from "@/components/ui/TeamBadge";
+import type { NestedEvent } from "@type-defs/event.ts";
 
 interface EventCellProps {
     event: NestedEvent;

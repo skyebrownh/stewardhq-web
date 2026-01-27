@@ -1,6 +1,6 @@
+import type { NestedEventAssignment } from "@type-defs/assignment";
 import type { NestedEvent } from "@type-defs/event";
 import type { NestedUser } from "@type-defs/user";
-import type { NestedEventAssignment } from "@type-defs/assignment";
 
 export interface Schedule {
     id: string;

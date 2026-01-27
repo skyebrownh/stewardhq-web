@@ -14,8 +14,10 @@ interface AssignmentModalContentProps {
 
 const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentProps) => {
     if (!assignment || !event) return null;
+
     const { weekdayLong, dayLong, monthShort, time: startTime } = formatEventDate(event.starts_at);
     const { time: endTime } = formatEventDate(event.ends_at);
+
     const requirementLevel =
         assignment.requirement_level.charAt(0).toUpperCase() + assignment.requirement_level.slice(1).toLowerCase();
     const requirementLevelBadgeColor =

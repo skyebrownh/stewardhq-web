@@ -1,8 +1,8 @@
 import { Heading } from "@/components/catalyst-ui-kit/heading";
 import { Button } from "@catalyst/button";
+import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
-import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
 import { formatScheduleDate } from "@lib/date";
 import type { Schedule } from "@type-defs/schedule";
 
