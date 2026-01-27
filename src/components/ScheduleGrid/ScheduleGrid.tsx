@@ -1,16 +1,16 @@
-import { useState } from "react";
 import { Table, TableBody, TableHead } from "@catalyst/table";
 import ScheduleGridSkeleton from "@components/skeletons/ScheduleGridSkeleton";
-import ErrorState from "@components/ui/ErrorState";
 import EmptyState from "@components/ui/EmptyState";
+import ErrorState from "@components/ui/ErrorState";
+import { queryClient } from "@lib/queryClient";
 import { useRolesQuery } from "@queries/roles.queries";
 import { useScheduleGridQuery, useSchedulesQuery } from "@queries/schedules.queries";
-import { queryClient } from "@lib/queryClient";
-import ScheduleGridRow from "./table/ScheduleGridRow";
-import ScheduleGridHeaderRow from "./table/ScheduleGridHeaderRow";
-import { useScheduleSelection } from "./hooks/useScheduleSelection";
+import { useState } from "react";
 import { useScheduleGridData } from "./hooks/useScheduleGridData";
+import { useScheduleSelection } from "./hooks/useScheduleSelection";
 import ScheduleGridHeader from "./table/ScheduleGridHeader";
+import ScheduleGridHeaderRow from "./table/ScheduleGridHeaderRow";
+import ScheduleGridRow from "./table/ScheduleGridRow";
 
 const ScheduleGrid = () => {
     const [hideUnavailable, setHideUnavailable] = useState(false);
