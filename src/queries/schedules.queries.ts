@@ -1,14 +1,15 @@
-import { getScheduleGrid, getSchedules } from "@api/schedules.api";
+import type { ScheduleGridResponse, ScheduleResponse } from "@api/schedules.api";
+import { getAllSchedules, getScheduleGrid } from "@api/schedules.api";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSchedulesQuery = () =>
-    useQuery({
+    useQuery<ScheduleResponse[]>({
         queryKey: ["schedules"],
-        queryFn: getSchedules
+        queryFn: getAllSchedules
     });
 
 export const useScheduleGridQuery = (scheduleId?: string) =>
-    useQuery({
+    useQuery<ScheduleGridResponse>({
         queryKey: ["schedule-grid", scheduleId],
         queryFn: () => getScheduleGrid(scheduleId!),
         gcTime: 60 * 60 * 1000, // 1 hour

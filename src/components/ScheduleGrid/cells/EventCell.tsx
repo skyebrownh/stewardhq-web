@@ -1,10 +1,10 @@
 import TeamBadge from "@/components/ui/TeamBadge";
+import type { ScheduleGridEvent } from "@api/schedules.api";
 import { TableCell } from "@catalyst/table";
 import { formatEventDate } from "@lib/date";
-import type { NestedEvent } from "@type-defs/event.ts";
 
 interface EventCellProps {
-    event: NestedEvent;
+    event: ScheduleGridEvent;
 }
 
 const EventCell = ({ event }: EventCellProps) => {

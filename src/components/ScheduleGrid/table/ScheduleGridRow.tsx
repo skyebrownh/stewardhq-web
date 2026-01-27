@@ -1,24 +1,23 @@
 import EventCell from "@/components/ScheduleGrid/cells/EventCell";
 import RoleAssignmentCell from "@/components/ScheduleGrid/cells/RoleAssignmentCell";
 import UnavailableCell from "@/components/ScheduleGrid/cells/UnavailableCell";
-import type { Role } from "@/types/role";
+import type { RoleResponse } from "@api/roles.api";
+import type { ScheduleGridEventAssignment, ScheduleGridEventResponse } from "@api/schedules.api";
 import { TableCell, TableRow } from "@catalyst/table";
-import type { NestedEventAssignment } from "@type-defs/assignment";
-import type { ScheduleGridEvent } from "@type-defs/schedule";
 
 interface ScheduleGridRowProps {
-    eventObj: ScheduleGridEvent;
-    activeRoles: Role[];
+    eventObj: ScheduleGridEventResponse;
+    roles: RoleResponse[];
     hideUnavailable: boolean;
-    roleMap: Map<string, NestedEventAssignment>;
+    roleMap: Map<string, ScheduleGridEventAssignment>;
 }
 
-const ScheduleGridRow = ({ eventObj, activeRoles, hideUnavailable, roleMap }: ScheduleGridRowProps) => {
+const ScheduleGridRow = ({ eventObj, roles, hideUnavailable, roleMap }: ScheduleGridRowProps) => {
     return (
         <TableRow>
             <EventCell event={eventObj.event} />
 
-            {activeRoles.map((role) => {
+            {roles.map((role) => {
                 const assignment = roleMap.get(role.code);
 
                 if (!assignment)
@@ -28,7 +27,7 @@ const ScheduleGridRow = ({ eventObj, activeRoles, hideUnavailable, roleMap }: Sc
                         </TableCell>
                     );
 
-                return <RoleAssignmentCell key={role.id} assignment={assignment} />;
+                return <RoleAssignmentCell key={role.id} eventId={eventObj.event.id} assignment={assignment} />;
             })}
 
             {!hideUnavailable && <UnavailableCell availability={eventObj.availability} />}

@@ -1,12 +1,12 @@
-import type { Role } from "@/types/role";
+import type { RoleResponse } from "@api/roles.api";
 import { TableHeader, TableRow } from "@catalyst/table";
 
 interface ScheduleGridHeaderRowProps {
-    activeRoles: Role[];
+    roles: RoleResponse[];
     hideUnavailable: boolean;
 }
 
-const ScheduleGridHeaderRow = ({ activeRoles, hideUnavailable }: ScheduleGridHeaderRowProps) => {
+const ScheduleGridHeaderRow = ({ roles, hideUnavailable }: ScheduleGridHeaderRowProps) => {
     const getAbbreviatedRoleName = (role_name: string) => {
         // TODO: Add an abbreviated name to role in DB
         return role_name.replace("Camera Director", "Cam Director").replace("Camera", "");
@@ -16,11 +16,12 @@ const ScheduleGridHeaderRow = ({ activeRoles, hideUnavailable }: ScheduleGridHea
         <TableRow className="bg-slate-100 text-slate-800">
             <TableHeader className="px-2!">Event</TableHeader>
 
-            {activeRoles.map((role) => (
+            {roles.map((role) => (
                 <TableHeader key={role.id} className="pl-5!">
                     {getAbbreviatedRoleName(role.name)}
                 </TableHeader>
             ))}
+
             {!hideUnavailable && <TableHeader className="px-2! bg-red-50 text-red-700">Unavailable</TableHeader>}
         </TableRow>
     );

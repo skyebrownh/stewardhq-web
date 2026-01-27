@@ -2,31 +2,34 @@ import Badge from "@/components/ui/Badge";
 import TeamBadge from "@/components/ui/TeamBadge";
 import UserComboBox from "@/components/ui/UserComboBox";
 import { formatEventDate } from "@/lib/date";
-import type { Assignment } from "@/types/assignment";
-import type { NestedEvent } from "@/types/event";
+import {
+    REQUIREMENT_COLORS,
+    REQUIREMENT_LABELS,
+    type RequirementLevel,
+    type RequirementLevelColor
+} from "@/lib/domain";
+import type { ScheduleGridEvent, ScheduleGridEventAssignment } from "@api/schedules.api";
 import { DescriptionDetails, DescriptionList, DescriptionTerm } from "@catalyst/description-list";
 import { DialogBody, DialogDescription } from "@catalyst/dialog";
 
 interface AssignmentModalContentProps {
-    assignment?: Assignment;
-    event?: NestedEvent;
+    assignment: ScheduleGridEventAssignment;
+    event: ScheduleGridEvent;
 }
 
 const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentProps) => {
-    if (!assignment || !event) return null;
+    const start = formatEventDate(event.starts_at);
+    const end = formatEventDate(event.ends_at);
 
-    const { weekdayLong, dayLong, monthShort, time: startTime } = formatEventDate(event.starts_at);
-    const { time: endTime } = formatEventDate(event.ends_at);
-
-    const requirementLevel =
-        assignment.requirement_level.charAt(0).toUpperCase() + assignment.requirement_level.slice(1).toLowerCase();
-    const requirementLevelBadgeColor =
-        requirementLevel === "Required" ? "red" : requirementLevel === "Preferred" ? "yellow" : "gray";
+    const level: RequirementLevel = assignment.requirement_level as RequirementLevel;
+    const levelLabel: string = REQUIREMENT_LABELS[level];
+    const levelColor: RequirementLevelColor = REQUIREMENT_COLORS[level];
 
     return (
         <>
             <DialogDescription>
-                {event.event_type_name} - {weekdayLong} {monthShort} {dayLong}, {startTime} - {endTime}
+                {event.event_type_name} - {start.weekdayLong} {start.monthShort} {start.dayLong}, {start.time} -{" "}
+                {end.time}
             </DialogDescription>
             {event.notes && <DialogDescription>{event.notes}</DialogDescription>}
             <DialogBody>
@@ -36,7 +39,7 @@ const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentPro
 
                     <DescriptionTerm>Requirement Level</DescriptionTerm>
                     <DescriptionDetails>
-                        <Badge color={requirementLevelBadgeColor}>{requirementLevel}</Badge>
+                        <Badge color={levelColor}>{levelLabel}</Badge>
                     </DescriptionDetails>
 
                     <DescriptionTerm>Team</DescriptionTerm>
