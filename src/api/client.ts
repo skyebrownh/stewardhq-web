@@ -1,5 +1,5 @@
-const BASE_URL = import.meta.env.VITE_STEWARDHQ_API_BASE_URL;
-const API_KEY = import.meta.env.VITE_STEWARDHQ_API_KEY;
+const BASE_URL: string = import.meta.env.VITE_STEWARDHQ_API_BASE_URL as string;
+const API_KEY: string = import.meta.env.VITE_STEWARDHQ_API_KEY as string;
 
 export const apiFetch = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
     const res = await fetch(`${BASE_URL}${path}`, {

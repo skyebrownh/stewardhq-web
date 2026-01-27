@@ -24,7 +24,7 @@ const UserComboBox = ({ currentUserId }: UserComboBoxProps) => {
             name="user"
             options={users.map((user) => user.id)}
             displayValue={getDisplayName}
-            value={selectedUserId || undefined}
+            value={selectedUserId || ""}
             placeholder="Select a user..."
             onChange={setSelectedUserId}>
             {(userId: string) => (

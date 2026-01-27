@@ -1,16 +1,14 @@
-import { useState } from "react";
-import { Dialog } from "@catalyst/dialog";
-import { DialogTitle } from "@catalyst/dialog";
-import { useNavigate, useParams } from "react-router";
-import { useAssignmentQuery } from "@/queries/assignments.queries";
-import { useEventQuery } from "@/queries/events.queries";
+import AssignmentModalSkeleton from "@/components/skeletons/AssignmentModalSkeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import ErrorState from "@/components/ui/ErrorState";
 import { queryClient } from "@/lib/queryClient";
-import AssignmentModalSkeleton from "@/components/skeletons/AssignmentModalSkeleton";
-import AssignmentModalContent from "./AssignmentModalContent";
+import { useAssignmentQuery } from "@/queries/assignments.queries";
+import { useEventQuery } from "@/queries/events.queries";
 import { Button } from "@catalyst/button";
-import { DialogActions } from "@catalyst/dialog";
+import { Dialog, DialogActions, DialogTitle } from "@catalyst/dialog";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import AssignmentModalContent from "./AssignmentModalContent";
 
 const AssignmentModal = () => {
     const navigate = useNavigate();
@@ -19,14 +17,19 @@ const AssignmentModal = () => {
     const { data: event, isLoading: eventLoading, error: eventError } = useEventQuery(assignment?.eventId);
     const [isOpen, setIsOpen] = useState(true);
 
-    const handleClick = () => {
+    const handleAssign = () => {
         setIsOpen(false);
-        navigate("/");
+        void navigate("/");
     };
 
     const handleRetry = () => {
         if (!assignmentId) return;
-        queryClient.invalidateQueries({ queryKey: ["assignment", assignmentId] });
+        void queryClient.invalidateQueries({ queryKey: ["assignment", assignmentId] });
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+        void navigate("/");
     };
 
     const isLoading = assignmentLoading || eventLoading;
@@ -35,7 +38,7 @@ const AssignmentModal = () => {
     const hasContent = !isLoading && !isError && assignment && event;
 
     return (
-        <Dialog open={isOpen} onClose={setIsOpen}>
+        <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>Update Assignment</DialogTitle>
 
             {isLoading && <AssignmentModalSkeleton />}
@@ -53,10 +56,10 @@ const AssignmentModal = () => {
             {hasContent && <AssignmentModalContent assignment={assignment} event={event} />}
 
             <DialogActions>
-                <Button plain onClick={handleClick}>
+                <Button plain onClick={handleClose}>
                     Cancel
                 </Button>
-                {hasContent && <Button onClick={handleClick}>Assign</Button>}
+                {hasContent && <Button onClick={handleAssign}>Assign</Button>}
             </DialogActions>
         </Dialog>
     );

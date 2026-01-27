@@ -1,8 +1,8 @@
-import type { Schedule, ScheduleGridResponse } from "@type-defs/schedule";
+import { queryClient } from "@/lib/queryClient";
 import type { Assignment, NestedEventAssignment } from "@type-defs/assignment";
 import type { Role } from "@type-defs/role";
+import type { Schedule, ScheduleGridResponse } from "@type-defs/schedule";
 import { useEffect, useMemo } from "react";
-import { queryClient } from "@/lib/queryClient";
 
 export function useScheduleGridData(roles?: Role[], schedules?: Schedule[], scheduleGrid?: ScheduleGridResponse) {
     const activeRoles = useMemo(() => {

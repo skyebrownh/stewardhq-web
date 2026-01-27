@@ -1,5 +1,5 @@
+import { getScheduleGrid, getSchedules } from "@api/schedules.api";
 import { useQuery } from "@tanstack/react-query";
-import { getSchedules, getScheduleGrid } from "@api/schedules.api";
 
 export const useSchedulesQuery = () =>
     useQuery({

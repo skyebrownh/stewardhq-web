@@ -1,5 +1,5 @@
-import { TableRow, TableHeader } from "@catalyst/table";
 import type { Role } from "@/types/role";
+import { TableHeader, TableRow } from "@catalyst/table";
 
 interface ScheduleGridHeaderRowProps {
     activeRoles: Role[];
@@ -16,7 +16,7 @@ const ScheduleGridHeaderRow = ({ activeRoles, hideUnavailable }: ScheduleGridHea
         <TableRow className="bg-slate-100 text-slate-800">
             <TableHeader className="px-2!">Event</TableHeader>
 
-            {activeRoles?.map((role) => (
+            {activeRoles.map((role) => (
                 <TableHeader key={role.id} className="pl-5!">
                     {getAbbreviatedRoleName(role.name)}
                 </TableHeader>
