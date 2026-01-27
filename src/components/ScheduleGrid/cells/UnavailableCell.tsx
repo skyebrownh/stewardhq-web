@@ -1,8 +1,8 @@
+import type { ScheduleGridAvailability } from "@api/schedules.api";
 import { TableCell } from "@catalyst/table";
-import type { NestedUser } from "@type-defs/user";
 
 interface UnavailableCellProps {
-    availability: NestedUser[];
+    availability: ScheduleGridAvailability[];
 }
 
 const UnavailableCell = ({ availability }: UnavailableCellProps) => {

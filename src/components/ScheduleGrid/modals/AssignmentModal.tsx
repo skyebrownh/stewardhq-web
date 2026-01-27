@@ -1,65 +1,67 @@
-import AssignmentModalSkeleton from "@/components/skeletons/AssignmentModalSkeleton";
-import EmptyState from "@/components/ui/EmptyState";
-import ErrorState from "@/components/ui/ErrorState";
+import { AssignmentModalSkeletonDialog } from "@/components/skeletons/AssignmentModalSkeleton";
+import { EmptyStateDialog } from "@/components/ui/EmptyState";
+import { ErrorStateDialog } from "@/components/ui/ErrorState";
 import { queryClient } from "@/lib/queryClient";
-import { useAssignmentQuery } from "@/queries/assignments.queries";
-import { useEventQuery } from "@/queries/events.queries";
+import { useScheduleGridQuery } from "@/queries/schedules.queries";
 import { Button } from "@catalyst/button";
 import { Dialog, DialogActions, DialogTitle } from "@catalyst/dialog";
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import AssignmentModalContent from "./AssignmentModalContent";
 
 const AssignmentModal = () => {
     const navigate = useNavigate();
-    const { assignmentId } = useParams();
-    const { data: assignment, isLoading: assignmentLoading, error: assignmentError } = useAssignmentQuery(assignmentId);
-    const { data: event, isLoading: eventLoading, error: eventError } = useEventQuery(assignment?.eventId);
-    const [isOpen, setIsOpen] = useState(true);
+    const { scheduleId, eventId, assignmentId } = useParams();
+
+    const {
+        data: scheduleGrid,
+        isLoading: scheduleGridLoading,
+        error: scheduleGridError
+    } = useScheduleGridQuery(scheduleId);
+
+    const eventObj = scheduleGrid?.events.find((eventObj) => eventObj.event.id === eventId);
+    const event = eventObj?.event;
+    const assignment = eventObj?.event_assignments.find((assignment) => assignment.id === assignmentId);
 
     const handleAssign = () => {
-        setIsOpen(false);
-        void navigate("/");
+        void navigate(`/schedules/${scheduleId}/grid`, { replace: true });
     };
 
     const handleRetry = () => {
-        if (!assignmentId) return;
-        void queryClient.invalidateQueries({ queryKey: ["assignment", assignmentId] });
+        if (!scheduleId) return;
+        void queryClient.invalidateQueries({ queryKey: ["schedule-grid", scheduleId] });
     };
 
     const handleClose = () => {
-        setIsOpen(false);
-        void navigate("/");
+        void navigate(`/schedules/${scheduleId}/grid`, { replace: true });
     };
 
-    const isLoading = assignmentLoading || eventLoading;
-    const isError = assignmentError || eventError;
-    const isEmpty = !isLoading && !isError && (!assignment || !event);
-    const hasContent = !isLoading && !isError && assignment && event;
+    const isEmpty = !scheduleGridLoading && !scheduleGridError && (!assignment || !event);
+
+    if (scheduleGridLoading) return <AssignmentModalSkeletonDialog handleClose={handleClose} />;
+
+    if (scheduleGridError)
+        return (
+            <ErrorStateDialog
+                title="Error loading assignment or event."
+                message="Please try again."
+                onRetry={handleRetry}
+                handleClose={handleClose}
+            />
+        );
+
+    if (isEmpty) return <EmptyStateDialog message="Assignment or event not found." handleClose={handleClose} />;
 
     return (
-        <Dialog open={isOpen} onClose={handleClose}>
+        <Dialog open onClose={handleClose}>
             <DialogTitle>Update Assignment</DialogTitle>
 
-            {isLoading && <AssignmentModalSkeleton />}
-
-            {isError && (
-                <ErrorState
-                    title="Error loading assignment or event."
-                    message="Please try again."
-                    onRetry={handleRetry}
-                />
-            )}
-
-            {isEmpty && <EmptyState message="Assignment or event not found." />}
-
-            {hasContent && <AssignmentModalContent assignment={assignment} event={event} />}
+            <AssignmentModalContent assignment={assignment!} event={event!} />
 
             <DialogActions>
                 <Button plain onClick={handleClose}>
                     Cancel
                 </Button>
-                {hasContent && <Button onClick={handleAssign}>Assign</Button>}
+                <Button onClick={handleAssign}>Assign</Button>
             </DialogActions>
         </Dialog>
     );

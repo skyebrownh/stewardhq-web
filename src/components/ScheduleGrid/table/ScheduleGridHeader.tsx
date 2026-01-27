@@ -1,38 +1,28 @@
 import { Heading } from "@/components/catalyst-ui-kit/heading";
+import type { ScheduleResponse } from "@api/schedules.api";
 import { Button } from "@catalyst/button";
-import { Listbox, ListboxLabel, ListboxOption } from "@catalyst/listbox";
+import { Listbox, ListboxOption } from "@catalyst/listbox";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import { formatScheduleDate } from "@lib/date";
-import type { Schedule } from "@type-defs/schedule";
 
 interface ScheduleGridHeaderProps {
-    schedule: Schedule;
+    currentSchedule: ScheduleResponse;
+    schedules: ScheduleResponse[];
+    onSelectSchedule: (newScheduleId: string) => void;
     hideUnavailable: boolean;
     onToggleHideUnavailable: () => void;
-    schedules: Schedule[];
-    onSelectSchedule: (schedule: Schedule | null) => void;
 }
 
 const ScheduleGridHeader = ({
-    schedule,
+    currentSchedule,
     hideUnavailable,
     onToggleHideUnavailable,
     schedules,
     onSelectSchedule
 }: ScheduleGridHeaderProps) => {
     const unavailableLabel = hideUnavailable ? "Show Unavailable" : "Hide Unavailable";
-    const scheduleLabel = formatScheduleDate(schedule.year, schedule.month);
-
-    const scheduleOptions = schedules.map((s) => ({
-        id: s.id,
-        label: formatScheduleDate(s.year, s.month),
-        schedule: s
-    }));
-
-    const findScheduleByLabel = (scheduleLabel: string) => {
-        return scheduleOptions.find(({ label }) => label === scheduleLabel)?.schedule ?? null;
-    };
+    const scheduleLabel = formatScheduleDate(currentSchedule.year, currentSchedule.month);
 
     return (
         <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-slate-950/10 pb-6">
@@ -47,11 +37,11 @@ const ScheduleGridHeader = ({
                 <div>
                     <Listbox
                         name="schedule"
-                        value={scheduleLabel}
-                        onChange={(value: string) => onSelectSchedule(findScheduleByLabel(value))}>
-                        {scheduleOptions.map(({ id, label }) => (
-                            <ListboxOption key={id} value={label}>
-                                <ListboxLabel>{label}</ListboxLabel>
+                        value={currentSchedule.id}
+                        onChange={(newScheduleId: string) => onSelectSchedule(newScheduleId)}>
+                        {schedules.map((s) => (
+                            <ListboxOption key={s.id} value={s.id}>
+                                {formatScheduleDate(s.year, s.month)}
                             </ListboxOption>
                         ))}
                     </Listbox>
