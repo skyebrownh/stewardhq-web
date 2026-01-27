@@ -1,17 +1,25 @@
 import { format } from "date-fns/fp";
 
 interface EventDate {
-    weekday: string;
+    weekdayShort: string;
+    weekdayLong: string;
     day: string;
-    startTime: string;
+    dayLong: string;
+    monthShort: string;
+    monthLong: string;
+    time: string;
 }
 
 export const formatEventDate = (iso: string): EventDate => {
     const date = new Date(iso);
     return {
-        weekday: format("E", date),
+        weekdayShort: format("E", date),
+        weekdayLong: format("EEEE", date),
         day: format("dd", date),
-        startTime: format(`hh:mm a`, date)
+        dayLong: format("do", date),
+        monthShort: format("MMM", date),
+        monthLong: format("MMMM", date),
+        time: format(`hh:mm a`, date)
     };
 };
 
