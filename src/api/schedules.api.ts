@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import { type Schedule, type ScheduleGridResponse } from "../types/schedule";
+import { type Schedule, type ScheduleGridResponse } from "@type-defs/schedule";
 
 export const getSchedules = () => {
     return apiFetch<Schedule[]>("/schedules");

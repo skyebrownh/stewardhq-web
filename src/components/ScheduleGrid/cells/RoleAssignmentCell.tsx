@@ -11,9 +11,8 @@ interface RoleAssignmentCellProps {
 const RoleAssignmentCell = ({ assignment }: RoleAssignmentCellProps) => {
     return (
         <TableCell className="py-1.5! px-2!">
-            <Button plain disabled={!assignment?.is_applicable}>
-                {/* FIXME: Don't allow linking to assignments that are not applicable. And ensure available slots work as expected. */}
-                <Link to={`/assignments/${assignment?.id}`}>
+            <Link to={`/assignments/${assignment?.id}`}>
+                <Button plain disabled={!assignment?.is_applicable}>
                     <span className={`font-normal ${assignment?.is_applicable ? "text-slate-800" : "text-slate-400"}`}>
                         {assignment?.is_applicable
                             ? assignment?.assigned_user_first_name || (
@@ -21,8 +20,8 @@ const RoleAssignmentCell = ({ assignment }: RoleAssignmentCellProps) => {
                               )
                             : "—"}
                     </span>
-                </Link>
-            </Button>
+                </Button>
+            </Link>
         </TableCell>
     );
 };

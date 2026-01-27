@@ -1,4 +1,4 @@
-import type { NestedUser } from "@type-defs/schedule";
+import type { NestedUser } from "@type-defs/user";
 import { TableCell } from "@catalyst/table";
 
 interface UnavailableCellProps {
