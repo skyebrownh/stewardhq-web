@@ -1,11 +1,11 @@
-import type { Assignment } from "@/types/assignment";
-import type { NestedEvent } from "@/types/event";
-import { formatEventDate } from "@/lib/date";
-import { DialogDescription } from "@catalyst/dialog";
-import { DialogBody } from "@catalyst/dialog";
-import { DescriptionList, DescriptionTerm, DescriptionDetails } from "@catalyst/description-list";
 import Badge from "@/components/ui/Badge";
 import TeamBadge from "@/components/ui/TeamBadge";
+import UserComboBox from "@/components/ui/UserComboBox";
+import { formatEventDate } from "@/lib/date";
+import type { Assignment } from "@/types/assignment";
+import type { NestedEvent } from "@/types/event";
+import { DescriptionDetails, DescriptionList, DescriptionTerm } from "@catalyst/description-list";
+import { DialogBody, DialogDescription } from "@catalyst/dialog";
 
 interface AssignmentModalContentProps {
     assignment?: Assignment;
@@ -28,10 +28,6 @@ const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentPro
             </DialogDescription>
             {event.notes && <DialogDescription>{event.notes}</DialogDescription>}
             <DialogBody>
-                {/* <Field>
-                <Label>User</Label>
-                <Input name="user" placeholder="User" />
-            </Field> */}
                 <DescriptionList>
                     <DescriptionTerm>Role</DescriptionTerm>
                     <DescriptionDetails>{assignment.role_name}</DescriptionDetails>
@@ -48,7 +44,7 @@ const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentPro
 
                     <DescriptionTerm>Assigned User</DescriptionTerm>
                     <DescriptionDetails>
-                        {assignment.assigned_user_first_name} {assignment.assigned_user_last_name}
+                        <UserComboBox currentUserId={assignment.assigned_user_id} />
                     </DescriptionDetails>
                 </DescriptionList>
             </DialogBody>
