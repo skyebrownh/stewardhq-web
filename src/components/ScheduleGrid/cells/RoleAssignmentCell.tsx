@@ -12,21 +12,18 @@ interface RoleAssignmentCellProps {
 const RoleAssignmentCell = ({ eventId, assignment }: RoleAssignmentCellProps) => {
     return (
         <TableCell className="py-1.5! px-2!">
-            {assignment.is_applicable ? (
-                <Link to={`events/${eventId}/assignments/${assignment.id}`}>
-                    <Button plain>
+            <Link to={`events/${eventId}/assignments/${assignment.id}`}>
+                <Button plain>
+                    {assignment.is_applicable && (
                         <span className="font-normal text-slate-800">
                             {assignment.assigned_user_first_name || (
                                 <PlusCircleIcon className="w-6 h-6 text-blue-400" />
                             )}
                         </span>
-                    </Button>
-                </Link>
-            ) : (
-                <Button plain disabled>
-                    <span className="font-normal text-slate-400">—</span>
+                    )}
+                    {!assignment.is_applicable && <span className="font-normal text-slate-400">—</span>}
                 </Button>
-            )}
+            </Link>
         </TableCell>
     );
 };

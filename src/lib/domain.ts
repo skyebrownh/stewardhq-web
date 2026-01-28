@@ -13,17 +13,17 @@ export const getScheduleById: (schedules: ScheduleResponse[], scheduleId: string
     return schedules.find((s) => s.id === scheduleId) ?? null;
 };
 
-export type RequirementLevel = "REQUIRED" | "PREFERRED" | "OPTIONAL";
+export type RequirementLevel = "required" | "preferred" | "optional";
 export type RequirementLevelColor = "red" | "yellow" | "gray";
 
 export const REQUIREMENT_LABELS: Record<RequirementLevel, string> = {
-    REQUIRED: "Required",
-    PREFERRED: "Preferred",
-    OPTIONAL: "Optional"
+    required: "Required",
+    preferred: "Preferred",
+    optional: "Optional"
 };
 
 export const REQUIREMENT_COLORS: Record<RequirementLevel, RequirementLevelColor> = {
-    REQUIRED: "red",
-    PREFERRED: "yellow",
-    OPTIONAL: "gray"
+    required: "red",
+    preferred: "yellow",
+    optional: "gray"
 };
