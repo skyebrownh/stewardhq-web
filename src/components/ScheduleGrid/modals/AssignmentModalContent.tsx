@@ -37,6 +37,12 @@ const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentPro
                     <DescriptionTerm>Role</DescriptionTerm>
                     <DescriptionDetails>{assignment.role_name}</DescriptionDetails>
 
+                    <DescriptionTerm>Applicable</DescriptionTerm>
+                    <DescriptionDetails>
+                        {assignment.is_applicable && <Badge color="green">Yes</Badge>}
+                        {!assignment.is_applicable && <Badge color="red">No</Badge>}
+                    </DescriptionDetails>
+
                     <DescriptionTerm>Requirement Level</DescriptionTerm>
                     <DescriptionDetails>
                         <Badge color={levelColor}>{levelLabel}</Badge>
