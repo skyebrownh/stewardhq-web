@@ -1,13 +1,12 @@
 import { Combobox, ComboboxLabel, ComboboxOption } from "@catalyst/combobox";
 import { useUsersQuery } from "@queries/users.queries";
-import { useState } from "react";
 
 interface UserComboBoxProps {
-    currentUserId?: string;
+    selectedUserId?: string | undefined;
+    onUserIdChange: (userId: string | null) => void;
 }
 
-const UserComboBox = ({ currentUserId }: UserComboBoxProps) => {
-    const [selectedUserId, setSelectedUserId] = useState<string | null>(currentUserId || null);
+const UserComboBox = ({ selectedUserId, onUserIdChange }: UserComboBoxProps) => {
     const { data: users, isLoading, error } = useUsersQuery();
 
     if (isLoading) return <span className="text-sm text-gray-500">Loading users...</span>;
@@ -26,7 +25,7 @@ const UserComboBox = ({ currentUserId }: UserComboBoxProps) => {
             displayValue={getDisplayName}
             value={selectedUserId || ""}
             placeholder="Select a user..."
-            onChange={setSelectedUserId}>
+            onChange={onUserIdChange}>
             {(userId: string) => (
                 <ComboboxOption value={userId}>
                     <ComboboxLabel>{getDisplayName(userId)}</ComboboxLabel>

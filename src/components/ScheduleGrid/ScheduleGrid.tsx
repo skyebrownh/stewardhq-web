@@ -65,8 +65,8 @@ const ScheduleGrid = () => {
         return (
             <Container>
                 <ErrorState
-                    title="Unable to load schedule"
-                    message="There was an error loading the schedule. Please try again."
+                    title="Unable to load schedule view"
+                    message="There was an error loading the schedule view. Please try again."
                     onRetry={handleRetry}
                 />
             </Container>
