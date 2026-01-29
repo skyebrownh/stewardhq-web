@@ -7,7 +7,6 @@ import ScheduleGridHeader from "@components/ScheduleGrid/table/ScheduleGridHeade
 import ScheduleGridHeaderRow from "@components/ScheduleGrid/table/ScheduleGridHeaderRow";
 import ScheduleGridRow from "@components/ScheduleGrid/table/ScheduleGridRow";
 import ScheduleGridSkeleton from "@components/skeletons/ScheduleGridSkeleton";
-import Container from "@components/ui/Container";
 import { EmptyState } from "@components/ui/EmptyState";
 import { ErrorState } from "@components/ui/ErrorState";
 import { queryClient } from "@lib/queryClient";
@@ -54,33 +53,21 @@ const ScheduleGrid = () => {
         }
     };
 
-    if (rolesLoading || schedulesLoading || gridLoading)
-        return (
-            <Container>
-                <ScheduleGridSkeleton />
-            </Container>
-        );
+    if (rolesLoading || schedulesLoading || gridLoading) return <ScheduleGridSkeleton />;
 
     if (rolesError || schedulesError || gridError)
         return (
-            <Container>
-                <ErrorState
-                    title="Unable to load schedule view"
-                    message="There was an error loading the schedule view. Please try again."
-                    onRetry={handleRetry}
-                />
-            </Container>
+            <ErrorState
+                title="Unable to load schedule view"
+                message="There was an error loading the schedule view. Please try again."
+                onRetry={handleRetry}
+            />
         );
 
-    if (!effectiveSchedule)
-        return (
-            <Container>
-                <EmptyState message="No schedule found." />
-            </Container>
-        );
+    if (!effectiveSchedule) return <EmptyState message="No schedule found." />;
 
     return (
-        <Container>
+        <>
             <ScheduleGridHeader
                 currentSchedule={effectiveSchedule}
                 hideUnavailable={hideUnavailable}
@@ -112,7 +99,7 @@ const ScheduleGrid = () => {
                     })}
                 </TableBody>
             </Table>
-        </Container>
+        </>
     );
 };
 
