@@ -15,9 +15,11 @@ import { DialogBody, DialogDescription } from "@catalyst/dialog";
 interface AssignmentModalContentProps {
     assignment: ScheduleGridEventAssignment;
     event: ScheduleGridEvent;
+    selectedUserId: string | undefined;
+    onUserIdChange: (userId: string | null) => void;
 }
 
-const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentProps) => {
+const AssignmentModalContent = ({ assignment, event, selectedUserId, onUserIdChange }: AssignmentModalContentProps) => {
     const start = formatEventDate(event.starts_at);
     const end = formatEventDate(event.ends_at);
 
@@ -55,7 +57,7 @@ const AssignmentModalContent = ({ assignment, event }: AssignmentModalContentPro
 
                     <DescriptionTerm>Assigned User</DescriptionTerm>
                     <DescriptionDetails>
-                        <UserComboBox currentUserId={assignment.assigned_user_id} />
+                        <UserComboBox selectedUserId={selectedUserId} onUserIdChange={onUserIdChange} />
                     </DescriptionDetails>
                 </DescriptionList>
             </DialogBody>

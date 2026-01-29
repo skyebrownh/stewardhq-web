@@ -5,6 +5,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useScheduleGridQuery } from "@/queries/schedules.queries";
 import { Button } from "@catalyst/button";
 import { Dialog, DialogActions, DialogTitle } from "@catalyst/dialog";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import AssignmentModalContent from "./AssignmentModalContent";
 
@@ -21,6 +22,8 @@ const AssignmentModal = () => {
     const eventObj = scheduleGrid?.events.find((eventObj) => eventObj.event.id === eventId);
     const event = eventObj?.event;
     const assignment = eventObj?.event_assignments.find((assignment) => assignment.id === assignmentId);
+
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(assignment?.assigned_user_id ?? null);
 
     const handleAssign = () => {
         void navigate(`/schedules/${scheduleId}/grid`, { replace: true });
@@ -55,7 +58,12 @@ const AssignmentModal = () => {
         <Dialog open onClose={handleClose}>
             <DialogTitle>Update Assignment</DialogTitle>
 
-            <AssignmentModalContent assignment={assignment!} event={event!} />
+            <AssignmentModalContent
+                assignment={assignment!}
+                event={event!}
+                selectedUserId={selectedUserId ?? undefined}
+                onUserIdChange={setSelectedUserId}
+            />
 
             <DialogActions>
                 <Button plain onClick={handleClose}>
