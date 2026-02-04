@@ -11,3 +11,7 @@ export const getCurrentMonthAndYear = () => {
 export const capitalizeString = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 export const isDevelopment = (): boolean => ENV === "development";
+
+export const getHeaders = (token?: string | null) => {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};

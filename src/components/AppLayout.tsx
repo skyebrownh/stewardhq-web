@@ -1,6 +1,5 @@
 import { Avatar } from "@catalyst/avatar";
-import { Dropdown, DropdownButton } from "@catalyst/dropdown";
-import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from "@catalyst/navbar";
+import { Navbar, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer } from "@catalyst/navbar";
 import {
     Sidebar,
     SidebarBody,
@@ -13,15 +12,6 @@ import {
 } from "@catalyst/sidebar";
 import { SidebarLayout } from "@catalyst/sidebar-layout";
 import { SignedIn, SignedOut, SignInButton, useAuth, UserButton, useUser } from "@clerk/react-router";
-import {
-    Cog6ToothIcon,
-    InboxIcon,
-    MagnifyingGlassIcon,
-    QuestionMarkCircleIcon,
-    SparklesIcon,
-    Square2StackIcon,
-    TicketIcon
-} from "@heroicons/react/20/solid";
 import {
     ArrowRightEndOnRectangleIcon,
     CalendarIcon,
@@ -45,24 +35,19 @@ export const AppLayout = () => {
                 <Navbar className="bg-slate-100">
                     <NavbarSpacer />
                     <NavbarSection>
-                        <NavbarItem aria-label="Search">
-                            <MagnifyingGlassIcon />
-                        </NavbarItem>
-                        <NavbarItem aria-label="Inbox">
-                            <InboxIcon />
-                        </NavbarItem>
-                        <Dropdown>
-                            <DropdownButton as={NavbarItem}>
-                                {/* Show the sign-in button when the user is signed out */}
-                                <SignedOut>
-                                    <SignInButton />
-                                </SignedOut>
-                                {/* Show the user button when the user is signed in */}
-                                <SignedIn>
-                                    <UserButton />
-                                </SignedIn>
-                            </DropdownButton>
-                        </Dropdown>
+                        {/* Show the sign-in button when the user is signed out */}
+                        <SignedOut>
+                            <SignInButton>
+                                <NavbarItem>
+                                    <ArrowRightEndOnRectangleIcon />
+                                    <NavbarLabel>Sign in</NavbarLabel>
+                                </NavbarItem>
+                            </SignInButton>
+                        </SignedOut>
+                        {/* Show the user button when the user is signed in */}
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
                     </NavbarSection>
                 </Navbar>
             }
@@ -73,16 +58,6 @@ export const AppLayout = () => {
                             <Avatar src="/vite.svg" />
                             <SidebarLabel>StewardHQ</SidebarLabel>
                         </SidebarItem>
-                        <SidebarSection className="max-lg:hidden">
-                            <SidebarItem>
-                                <MagnifyingGlassIcon />
-                                <SidebarLabel>Search</SidebarLabel>
-                            </SidebarItem>
-                            <SidebarItem>
-                                <InboxIcon />
-                                <SidebarLabel>Inbox</SidebarLabel>
-                            </SidebarItem>
-                        </SidebarSection>
                     </SidebarHeader>
                     <SidebarBody>
                         <SidebarSection>
@@ -90,29 +65,9 @@ export const AppLayout = () => {
                                 <CalendarIcon />
                                 <SidebarLabel>Schedule</SidebarLabel>
                             </SidebarItem>
-                            <SidebarItem>
-                                <Square2StackIcon />
-                                <SidebarLabel>Events</SidebarLabel>
-                            </SidebarItem>
-                            <SidebarItem>
-                                <TicketIcon />
-                                <SidebarLabel>Orders</SidebarLabel>
-                            </SidebarItem>
-                            <SidebarItem>
-                                <Cog6ToothIcon />
-                                <SidebarLabel>Settings</SidebarLabel>
-                            </SidebarItem>
                         </SidebarSection>
                         <SidebarSpacer />
                         <SidebarSection>
-                            <SidebarItem>
-                                <QuestionMarkCircleIcon />
-                                <SidebarLabel>Support</SidebarLabel>
-                            </SidebarItem>
-                            <SidebarItem>
-                                <SparklesIcon />
-                                <SidebarLabel>Changelog</SidebarLabel>
-                            </SidebarItem>
                             {isDevelopment() && (
                                 <SidebarItem onClick={() => void fetchToken()}>
                                     <CheckBadgeIconSolid />

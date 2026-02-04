@@ -13,13 +13,13 @@ export interface ScheduleResponse {
 export interface ScheduleInsertBody {
     month: number;
     year: number;
-    notes?: string;
-    is_active?: boolean;
+    notes?: string | null;
+    is_active?: boolean | null;
 }
 
 export interface ScheduleUpdateBody {
-    notes?: string;
-    is_active?: boolean;
+    notes?: string | null;
+    is_active?: boolean | null;
 }
 
 export const getAllSchedules = () => {
