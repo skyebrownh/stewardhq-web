@@ -12,7 +12,7 @@ import {
     SidebarSpacer
 } from "@catalyst/sidebar";
 import { SidebarLayout } from "@catalyst/sidebar-layout";
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/react-router";
+import { SignedIn, SignedOut, SignInButton, useAuth, UserButton, useUser } from "@clerk/react-router";
 import {
     Cog6ToothIcon,
     InboxIcon,
@@ -22,11 +22,23 @@ import {
     Square2StackIcon,
     TicketIcon
 } from "@heroicons/react/20/solid";
-import { ArrowRightEndOnRectangleIcon, CalendarIcon } from "@heroicons/react/24/solid";
+import {
+    ArrowRightEndOnRectangleIcon,
+    CalendarIcon,
+    CheckBadgeIcon as CheckBadgeIconSolid
+} from "@heroicons/react/24/solid";
+import { isDevelopment } from "@lib/utils";
 import { Outlet } from "react-router";
 
 export const AppLayout = () => {
     const { user } = useUser();
+    const { getToken } = useAuth();
+
+    const fetchToken = async () => {
+        const token = await getToken({ template: "default" });
+        console.log(token);
+    };
+
     return (
         <SidebarLayout
             navbar={
@@ -101,6 +113,12 @@ export const AppLayout = () => {
                                 <SparklesIcon />
                                 <SidebarLabel>Changelog</SidebarLabel>
                             </SidebarItem>
+                            {isDevelopment() && (
+                                <SidebarItem onClick={() => void fetchToken()}>
+                                    <CheckBadgeIconSolid />
+                                    <SidebarLabel>Fetch Token</SidebarLabel>
+                                </SidebarItem>
+                            )}
                         </SidebarSection>
                     </SidebarBody>
                     <SidebarFooter className="max-lg:hidden">

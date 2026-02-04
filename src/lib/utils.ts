@@ -1,3 +1,5 @@
+const ENV: string = import.meta.env.VITE_ENV as string;
+
 export const getCurrentMonthAndYear = () => {
     const now = new Date();
     return {
@@ -7,3 +9,5 @@ export const getCurrentMonthAndYear = () => {
 };
 
 export const capitalizeString = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+export const isDevelopment = (): boolean => ENV === "development";
