@@ -2,16 +2,18 @@ import { AssignmentModalSkeletonDialog } from "@/components/skeletons/Assignment
 import { EmptyStateDialog } from "@/components/ui/EmptyState";
 import { ErrorStateDialog } from "@/components/ui/ErrorState";
 import { queryClient } from "@/lib/queryClient";
+import { useUpdateAssignmentMutation } from "@/queries/assignments.queries";
 import { useScheduleGridQuery } from "@/queries/schedules.queries";
 import { Button } from "@catalyst/button";
 import { Dialog, DialogActions, DialogTitle } from "@catalyst/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import AssignmentModalContent from "./AssignmentModalContent";
 
 const AssignmentModal = () => {
     const navigate = useNavigate();
     const { scheduleId, eventId, assignmentId } = useParams();
+    const [open, setOpen] = useState(true);
 
     const {
         data: scheduleGrid,
@@ -23,10 +25,19 @@ const AssignmentModal = () => {
     const event = eventObj?.event;
     const assignment = eventObj?.event_assignments.find((assignment) => assignment.id === assignmentId);
 
+    const updateAssignmentMutation = useUpdateAssignmentMutation(assignmentId, scheduleId);
+
     const [selectedUserId, setSelectedUserId] = useState<string | null>(assignment?.assigned_user_id ?? null);
 
+    useEffect(() => {
+        if (!open) void navigate(-1);
+    }, [open, navigate]);
+
     const handleAssign = () => {
-        void navigate(`/schedules/${scheduleId}/grid`, { replace: true });
+        updateAssignmentMutation.mutate({
+            assigned_user_id: selectedUserId
+        });
+        setOpen(false);
     };
 
     const handleRetry = () => {
@@ -34,9 +45,7 @@ const AssignmentModal = () => {
         void queryClient.invalidateQueries({ queryKey: ["schedule-grid", scheduleId] });
     };
 
-    const handleClose = () => {
-        void navigate(`/schedules/${scheduleId}/grid`, { replace: true });
-    };
+    const handleClose = () => setOpen(false);
 
     const isEmpty = !scheduleGridLoading && !scheduleGridError && (!assignment || !event);
 
@@ -55,7 +64,7 @@ const AssignmentModal = () => {
     if (isEmpty) return <EmptyStateDialog message="Assignment or event not found." handleClose={handleClose} />;
 
     return (
-        <Dialog open onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Update Assignment</DialogTitle>
 
             <AssignmentModalContent
@@ -69,7 +78,9 @@ const AssignmentModal = () => {
                 <Button plain onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button onClick={handleAssign}>Assign</Button>
+                <Button onClick={handleAssign} disabled={assignment!.assigned_user_id === selectedUserId}>
+                    Assign
+                </Button>
             </DialogActions>
         </Dialog>
     );

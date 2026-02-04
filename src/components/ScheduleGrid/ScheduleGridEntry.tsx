@@ -20,7 +20,7 @@ const ScheduleGridEntry = () => {
     const defaultScheduleId = useMemo(() => {
         if (!schedules || schedules.length === 0) return null;
         const defaultSchedule = getCurrentSchedule(schedules);
-        return defaultSchedule?.id ?? null;
+        return defaultSchedule?.id ?? schedules[0].id;
     }, [schedules]);
 
     useEffect(() => {

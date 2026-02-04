@@ -5,6 +5,7 @@ export const apiFetch = async <T>(path: string, options: RequestInit = {}): Prom
     const res = await fetch(`${BASE_URL}${path}`, {
         ...options,
         headers: {
+            "Content-Type": "application/json",
             "x-api-key": API_KEY,
             ...options.headers
         }

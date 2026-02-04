@@ -1,4 +1,5 @@
 import type { RequirementLevel } from "@/lib/domain";
+import { getHeaders } from "@lib/utils";
 import { apiFetch } from "./client";
 
 export interface AssignmentResponse {
@@ -46,19 +47,20 @@ export interface AssignmentResponse {
 }
 
 export interface AssignmentUpdateBody {
-    is_applicable?: boolean;
-    requirement_level?: RequirementLevel;
-    assigned_user_id?: string;
-    is_active?: boolean;
+    is_applicable?: boolean | null;
+    requirement_level?: RequirementLevel | null;
+    assigned_user_id?: string | null;
+    is_active?: boolean | null;
 }
 
 export const getAssignmentsByEvent = (eventId: string) => {
     return apiFetch<AssignmentResponse[]>(`/events/${eventId}/assignments`);
 };
 
-export const updateAssignment = (assignmentId: string, body: AssignmentUpdateBody) => {
+export const updateAssignment = (assignmentId: string, body: AssignmentUpdateBody, token: string | null) => {
     return apiFetch<AssignmentResponse>(`/assignments/${assignmentId}`, {
         method: "PATCH",
+        headers: getHeaders(token),
         body: JSON.stringify(body)
     });
 };
