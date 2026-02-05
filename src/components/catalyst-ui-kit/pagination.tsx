@@ -64,11 +64,14 @@ export function PaginationPage({
   current = false,
   children,
 }: React.PropsWithChildren<{ href: string; className?: string; current?: boolean }>) {
+  const pageLabel =
+    typeof children === 'string' || typeof children === 'number' ? `Page ${children}` : 'Page'
+
   return (
     <Button
       href={href}
       plain
-      aria-label={`Page ${children}`}
+      aria-label={pageLabel}
       aria-current={current ? 'page' : undefined}
       className={clsx(
         className,
